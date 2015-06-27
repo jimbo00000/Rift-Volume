@@ -22,6 +22,7 @@ AppSkeleton::AppSkeleton()
 : m_scene()
 , m_hydraScene()
 , m_dashScene()
+, m_volumeScene()
 #ifdef USE_OCULUSSDK
 , m_ovrScene()
 #endif
@@ -55,6 +56,7 @@ AppSkeleton::AppSkeleton()
     m_scenes.push_back(&m_scene);
     m_scenes.push_back(&m_hydraScene);
     m_scenes.push_back(&m_dashScene);
+    m_scenes.push_back(&m_volumeScene);
 #ifdef USE_OCULUSSDK
     m_scenes.push_back(&m_ovrScene);
 #endif
@@ -62,6 +64,9 @@ AppSkeleton::AppSkeleton()
     // Give this scene a pointer to get live Hydra data for display
     m_hydraScene.SetFlyingMousePointer(&m_fm);
     m_dashScene.SetFlyingMousePointer(&m_fm);
+    m_volumeScene.SetFlyingMousePointer(&m_fm);
+
+    m_hyif.AddTransformation(m_volumeScene.GetTransformationPointer());
 
     ResetChassisTransformations();
 }

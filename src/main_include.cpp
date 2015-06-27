@@ -71,6 +71,10 @@ void InitializeBar()
                " min=-10 max=10 step=0.05 group='HydraScene' ");
     TwAddVarRW(g_pTweakbar, "Hydra Location z", TW_TYPE_FLOAT, &g_app.m_fm.m_baseOffset.z,
                " min=-10 max=10 step=0.05 group='HydraScene' ");
+
+
+    TwAddVarRW(g_pTweakbar, "Draw VolumeScene", TW_TYPE_BOOLCPP, &g_app.m_volumeScene.m_bDraw,
+        "  group='RaymarchScene' ");
 }
 #endif
 

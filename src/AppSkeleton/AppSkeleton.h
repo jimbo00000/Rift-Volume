@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "HydraScene.h"
 #include "DashboardScene.h"
+#include "VolumeScene.h"
 
 #ifdef USE_OCULUSSDK
 #include "OVRScene.h"
@@ -63,6 +64,7 @@ public:
     Scene m_scene;
     HydraScene m_hydraScene;
     DashboardScene m_dashScene;
+    VolumeScene m_volumeScene;
 
 #ifdef USE_OCULUSSDK
     OVRScene m_ovrScene;
