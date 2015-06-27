@@ -68,6 +68,10 @@ AppSkeleton::AppSkeleton()
 
     m_hyif.AddTransformation(m_volumeScene.GetTransformationPointer());
 
+    // Connect up tx widget to volume Scene
+    m_volumeScene.SetOpacityTexPointer(m_dashScene.GetOpacityTexPointer());
+    m_volumeScene.SetColorTexPointer(m_dashScene.GetColorTexPointer());
+
     ResetChassisTransformations();
 }
 

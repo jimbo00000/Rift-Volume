@@ -39,7 +39,17 @@ DashboardScene::DashboardScene()
     m_antPane.m_tx.SetDefaultOrientation(ori);
     m_antPane.m_tx.SetOrientation(ori);
 
+    {
+        const glm::vec3 pos(1.0f, 0.0f, -1.0f);
+        m_widgPane.m_tx.SetPosition(pos);
+        m_widgPane.m_tx.SetDefaultPosition(pos);
+        const glm::mat4 ori = glm::rotate(glm::mat4(1.0f), -0.6f, glm::vec3(0, 1, 0));
+        m_widgPane.m_tx.SetDefaultOrientation(ori);
+        m_widgPane.m_tx.SetOrientation(ori);
+    }
+
     m_panes.push_back(&m_antPane);
+    m_panes.push_back(&m_widgPane);
     m_bDraw = false;
 }
 
