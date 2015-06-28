@@ -15,8 +15,6 @@ VolumeScene::VolumeScene()
 , m_opacityTex(NULL)
 , m_colorTex(NULL)
 {
-    m_bDraw = false; // Since it's slow, let's not make the viewer barf off the bat
-
     glm::mat4 ori = glm::rotate(glm::mat4(1.0f), 0.5f*static_cast<float>(M_PI), glm::vec3(1,0,0));
     ori = glm::rotate(ori, static_cast<float>(M_PI), glm::vec3(0,0,1));
     m_tx.SetDefaultOrientation(ori);

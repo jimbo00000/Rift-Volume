@@ -50,7 +50,6 @@ DashboardScene::DashboardScene()
 
     m_panes.push_back(&m_antPane);
     m_panes.push_back(&m_widgPane);
-    m_bDraw = false;
 }
 
 DashboardScene::~DashboardScene()
