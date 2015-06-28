@@ -87,7 +87,7 @@ void RaymarchShaderScene::DrawScene(
         glUniformMatrix4fv(m_raymarch.GetUniLoc("obmtx"), 1, false, glm::value_ptr(object));
 
         // Extract viewing parameters encoded in projection matrix.
-        // Stereo separation is encoded here in riftskeleton during pre-translate by half IPD.
+        // Stereo separation is encoded here in RiftVolume during pre-translate by half IPD.
         const float tweak = glm::value_ptr(projection)[8];
         glUniform1f(m_raymarch.GetUniLoc("u_eyeballCenterTweak"), tweak);
         const float cot_fovby2 = glm::value_ptr(projection)[5];

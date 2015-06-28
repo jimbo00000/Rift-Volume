@@ -31,7 +31,7 @@ RiftAppSkeleton::RiftAppSkeleton()
     m_eyePoseCached = OVR::Posef();
     memset(m_logUserData, 0, 256);
 #ifdef USE_OVR_PERF_LOGGING
-    sprintf(m_logUserData, "RiftSkeleton");
+    sprintf(m_logUserData, "RiftVolume");
     // Unfortunately, the OVR perf log does not appear to re-read data
     // at the given user pointer each log entry(~1Hz). Is this a bug?
 #endif
@@ -96,7 +96,7 @@ void RiftAppSkeleton::initHMD()
     }
 
 #ifdef USE_OVR_PERF_LOGGING
-    ovrHmd_StartPerfLog(m_Hmd, "RiftSkeletonxxx-PerfLog.csv", m_logUserData);
+    ovrHmd_StartPerfLog(m_Hmd, "RiftVolumexxx-PerfLog.csv", m_logUserData);
 #endif
 
     //const unsigned int caps = ovrHmd_GetEnabledCaps(m_Hmd);

@@ -802,7 +802,7 @@ int main(int argc, char** argv)
     {
         // Create a normal, decorated application window
         LOG_INFO("Using Debug HMD mode.");
-        windowTitle = "RiftSkeleton-GLFW-DebugHMD";
+        windowTitle = "RiftVolume-GLFW-DebugHMD";
         g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
         l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
@@ -811,7 +811,7 @@ int main(int argc, char** argv)
     {
         // HMD active - position undecorated window to fill HMD viewport
         LOG_INFO("Using Direct to Rift mode.");
-        windowTitle = "RiftSkeleton-GLFW-Direct";
+        windowTitle = "RiftVolume-GLFW-Direct";
 
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -832,7 +832,7 @@ int main(int argc, char** argv)
     else
     {
         LOG_INFO("Using Extended desktop mode.");
-        windowTitle = "RiftSkeleton-GLFW-Extended";
+        windowTitle = "RiftVolume-GLFW-Extended";
 
         LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         glfwWindowHint(GLFW_DECORATED, 0);
@@ -845,7 +845,7 @@ int main(int argc, char** argv)
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
-    std::string windowTitle = "RiftSkeleton";
+    std::string windowTitle = "RiftVolume";
 #endif //USE_OCULUSSDK
 
     if (!l_Window)
