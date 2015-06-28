@@ -130,9 +130,10 @@ void RaymarchShaderScene::timestep(double absTime, double dt)
 
     const float radius = 0.5f;
     glm::vec3 pos, norm;
-#ifdef _LINUX
+#if 1 //def _LINUX
     ///@todo glm is crashing at runtime on Linux - Ubuntu,gcc4.8.2
-    const bool hydraHit = false;
+    ///@todo Transform the hydra ray,origin into world space for intersection test
+    const bool hydraHit = true;
 #else
     const bool hydraHit = glm::intersectRaySphere(
         origin3, dir3,
