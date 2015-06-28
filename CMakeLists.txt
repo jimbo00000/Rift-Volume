@@ -15,6 +15,7 @@ SET( GL_FRAMEWORK "GLFW" CACHE STRING "Which OpenGL windowing framework to use" 
 SET( USE_ANTTWEAKBAR TRUE CACHE BOOL "Use AntTweakBar" )
 SET( USE_SIXENSE TRUE CACHE BOOL "Use Sixense" )
 SET( USE_OCULUSSDK TRUE CACHE BOOL "Use Oculus SDK" )
+SET( USE_DCMTK TRUE CACHE BOOL "Use DCMTK" )
 
 SET( USE_CORE_CONTEXT TRUE CACHE BOOL "Use Core Context" )
 IF( USE_CORE_CONTEXT )
@@ -125,6 +126,16 @@ IF( WIN32 )
         ADD_DEFINITIONS( -DUSE_ANTTWEAKBAR )
     ENDIF( USE_ANTTWEAKBAR )
 
+    IF( USE_DCMTK )
+        SET( DCMTK_DEBUG   "${LIBS_HOME}/DCMTK-debug" CACHE STRING "DCMTK debug build root" )
+        SET( DCMTK_RELEASE "${LIBS_HOME}/DCMTK" CACHE STRING "DCMTK release build root" )
+        SET( DCMTK_ROOT ${DCMTK_DEBUG} )
+        INCLUDE_DIRECTORIES( "${DCMTK_ROOT}/include" )
+        LINK_DIRECTORIES   ( "${DCMTK_ROOT}/lib" )
+        SET( DICOM_LIBS dcmimage.lib dcmimgle.lib dcmdata.lib ofstd.lib oflog.lib netapi32.lib wsock32.lib )
+        ADD_DEFINITIONS( -DUSE_DCMTK )
+    ENDIF( USE_DCMTK )
+
     SET( PLATFORM_LIBS
         ${FRAMEWORK_LIBS}
         opengl32.lib glu32.lib glew32s.lib
@@ -133,6 +144,7 @@ IF( WIN32 )
         ws2_32.lib
         ${HYDRA_LIBS}
         ${ANT_LIBS}
+        ${DICOM_LIBS}
         )
 
     ADD_DEFINITIONS( /W4 -D_CRT_SECURE_NO_WARNINGS )
@@ -318,6 +330,11 @@ FILE( GLOB_RECURSE FLYINGMOUSE_SOURCE_FILES
     src/FlyingMouse/*.h
     )
 
+FILE( GLOB_RECURSE DICOM_SOURCE_FILES
+    src/Dicom/*.cpp
+    src/Dicom/*.h
+    )
+
 # Manually exclude the OVR-dependent files from file lists.
 IF( NOT USE_OCULUSSDK )
     MESSAGE( "Removing OVR-dependent files..." )
@@ -334,11 +351,13 @@ INCLUDE_DIRECTORIES("src/Util/GL")
 INCLUDE_DIRECTORIES("src/AppSkeleton")
 INCLUDE_DIRECTORIES("src/Scene")
 INCLUDE_DIRECTORIES("src/FlyingMouse")
+INCLUDE_DIRECTORIES("src/Dicom")
 
 ADD_LIBRARY( Util        ${UTIL_SOURCE_FILES} )
 ADD_LIBRARY( AppSkeleton ${APPSKELETON_SOURCE_FILES} )
 ADD_LIBRARY( Scene       ${SCENE_SOURCE_FILES} )
 ADD_LIBRARY( FlyingMouse ${FLYINGMOUSE_SOURCE_FILES} )
+ADD_LIBRARY( Dicom       ${DICOM_SOURCE_FILES} )
 
 IF( GL_FRAMEWORK STREQUAL "GLFW" )
     ADD_EXECUTABLE( ${PROJECT_NAME} src/glfw_main.cpp )
@@ -353,5 +372,6 @@ TARGET_LINK_LIBRARIES( ${PROJECT_NAME}
     Scene
     Util
     FlyingMouse
+    Dicom
     ${PLATFORM_LIBS}
     )
