@@ -330,7 +330,7 @@ void AppSkeleton::timestep(double absTime, double dt)
     }
 
     // Dashboard interaction
-    if (m_fm.WasJustPressed(FlyingMouse::Right, SIXENSE_BUTTON_BUMPER))
+    if (m_fm.WasJustPressed(FlyingMouse::Right, SIXENSE_BUTTON_START))
     {
         m_dashScene.m_bDraw = !m_dashScene.m_bDraw;
         m_dashScene.ResizeTweakbar();
