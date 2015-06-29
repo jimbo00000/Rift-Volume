@@ -36,7 +36,7 @@ void VolumeScene::initGL()
     glBindVertexArray(0);
 
     //LoadTextureFromBrickOfShorts("ct002_256.bos");
-    LoadTextureFromDicom("I:/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0020");
+    LoadTextureFromDicom("I:/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0002");
 }
 
 void VolumeScene::LoadTextureFromBrickOfShorts(const char* pFilename)

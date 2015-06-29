@@ -18,5 +18,5 @@ for f in files:
 	for line in fh:
 		for tok in line.split(): # split on whitespace
 			if re.match("^DCM_", tok): # match SDL constants
-				print('{{ "{0}", {0} }}'.format(tok))
+				print('{{ "{0}", {0} }},'.format(tok))
 	fh.close()

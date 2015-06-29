@@ -1,6 +1,7 @@
 // DicomLoader.cpp
 
 #include "DicomLoader.h"
+#include "DicomConstants.h"
 
 DicomLoader::DicomLoader(const char* filename)
 : m_fileformat(0)
@@ -16,7 +17,7 @@ DicomLoader::DicomLoader(const char* filename)
 
     LoadDICOMFile(filename);
     GenerateGLTexture();
-    //PrintDICOMInfo();
+    PrintDICOMInfo();
 }
 
 DicomLoader::~DicomLoader()
@@ -165,4 +166,21 @@ void DicomLoader::GenerateGLTexture()
                  NULL);
 
     glBindTexture(GL_TEXTURE_3D, 0);
+}
+
+// Print DICOM info string values to stdout.
+void DicomLoader::PrintDICOMInfo() const
+{
+    if (!m_dataset)
+        return;
+
+    OFString data;
+
+    for (int i=0; constants[i].name != NULL; ++i)
+    {
+        if (m_dataset->findAndGetOFString(constants[i].tagKey, data).good())
+        {
+            std::cout << constants[i].name << ": " << data << std::endl;
+        }
+    }
 }
