@@ -16,13 +16,13 @@ DicomLoader::DicomLoader(const char* filename)
 
     LoadDICOMFile(filename);
     GenerateGLTexture();
-    PrintDICOMInfo();
+    //PrintDICOMInfo();
 }
 
 DicomLoader::~DicomLoader()
 {
-    delete m_fileformat;
     delete m_dataset;
+    //delete m_fileformat;
 
     // TODO: glDeleteTextures
 }

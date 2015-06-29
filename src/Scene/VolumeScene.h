@@ -19,6 +19,7 @@ public:
 
     virtual void initGL();
     virtual void LoadTextureFromBrickOfShorts(const char* pFilename);
+    virtual void LoadTextureFromDicom(const char* pFilename);
 
     virtual void SetOpacityTexPointer(GLuint* pTex) { m_opacityTex = pTex; }
     virtual void SetColorTexPointer(GLuint* pTex) { m_colorTex = pTex; }

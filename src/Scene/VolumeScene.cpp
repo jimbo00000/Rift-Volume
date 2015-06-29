@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <glm/glm.hpp>
 
+#include "DicomLoader.h"
+
 VolumeScene::VolumeScene()
 : RaymarchShaderScene()
 , m_volumeTex(0)
@@ -33,7 +35,8 @@ void VolumeScene::initGL()
     _InitShaderRectAttributes();
     glBindVertexArray(0);
 
-    LoadTextureFromBrickOfShorts("ct002_256.bos");
+    //LoadTextureFromBrickOfShorts("ct002_256.bos");
+    LoadTextureFromDicom("I:/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0020");
 }
 
 void VolumeScene::LoadTextureFromBrickOfShorts(const char* pFilename)
@@ -120,6 +123,18 @@ void VolumeScene::LoadTextureFromBrickOfShorts(const char* pFilename)
     delete [] pShortData;
 
     fclose(pFile);
+}
+
+void VolumeScene::LoadTextureFromDicom(const char* pFilename)
+{
+    DicomLoader* pDicomLoader = new DicomLoader(pFilename);
+    if (pDicomLoader != NULL)
+    {
+        m_volumeTex = pDicomLoader->m_3dtex;
+        //m_dim = pDicomLoader->m_dim;
+
+        delete pDicomLoader;
+    }
 }
 
 void VolumeScene::_DrawScreenQuad() const
