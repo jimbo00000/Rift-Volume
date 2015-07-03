@@ -36,7 +36,11 @@ void VolumeScene::initGL()
     glBindVertexArray(0);
 
     //LoadTextureFromBrickOfShorts("ct002_256.bos");
+#ifdef _LINUX
+    LoadTextureFromDicom("/run/media/jim/300GHD/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0002");
+#else
     LoadTextureFromDicom("I:/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0002");
+#endif
 }
 
 void VolumeScene::LoadTextureFromBrickOfShorts(const char* pFilename)

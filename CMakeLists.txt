@@ -208,6 +208,11 @@ ELSEIF( APPLE )
         ADD_DEFINITIONS( -DUSE_ANTTWEAKBAR )
     ENDIF( USE_ANTTWEAKBAR )
 
+    IF( USE_DCMTK )
+        SET( DICOM_LIBS -ldcmimage -ldcmimgle -ldcmdata -lofstd -loflog )
+        ADD_DEFINITIONS( -DUSE_DCMTK )
+    ENDIF( USE_DCMTK )
+
     #SET( PLATFORM_LIBS libovr.a ${COCOA_LIBRARY} ${IOKIT_LIBRARY} )
     SET( PLATFORM_LIBS
         ${FRAMEWORK_LIBS}
@@ -220,6 +225,7 @@ ELSEIF( APPLE )
         -lglfw
         ${HYDRA_LIBS}
         ${ANT_LIBS}
+        ${DICOM_LIBS}
         )
         # TODO: SDL2 or glfw
 
@@ -284,6 +290,11 @@ ELSEIF( UNIX )
         ADD_DEFINITIONS( -DUSE_ANTTWEAKBAR )
     ENDIF( USE_ANTTWEAKBAR )
 
+    IF( USE_DCMTK )
+        SET( DICOM_LIBS -ldcmimage -ldcmimgle -ldcmdata -lofstd -loflog )
+        ADD_DEFINITIONS( -DUSE_DCMTK )
+    ENDIF( USE_DCMTK )
+
     find_package(OpenGL REQUIRED)
     include_directories( ${OPENGL_INCLUDE_DIRS} )
 
@@ -303,6 +314,7 @@ ELSEIF( UNIX )
         -lXcursor # GLFW 3.1
         ${HYDRA_LIBS}
         ${ANT_LIBS}
+        ${DICOM_LIBS}
         )
 ENDIF()
 

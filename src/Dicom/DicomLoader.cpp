@@ -12,7 +12,7 @@ DicomLoader::DicomLoader(const char* filename)
 , m_3dtex(0)
 , m_3dtexGr(0)
 {
-    glm::ivec3 dim = {0,0,0};
+    glm::ivec3 dim(0,0,0);
     m_dim = dim;
 
     LoadDICOMFile(filename);
