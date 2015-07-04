@@ -22,7 +22,8 @@ plus some floating in-world UI panes.
 I set up my local build environment with libraries installed under a single directory(**C:/lib** on Windows, **~/lib** on Linux, **~/Development** on MacOS). This location can be changed in cmake-gui by modifying the **LIBS_HOME** variable or by editing it in CMakeLists.txt directly.
 
 ### Building Offis DCMTK
-Get the latest source from the git repo:
+Get the latest source from the git repo:  
+
      git clone git://git.dcmtk.org/dcmtk
 
 #### Windows
@@ -32,7 +33,8 @@ Use CMake for an out-of-source build. Either run Visual Studio as Administrator 
 Be sure to substitute **Debug** or **Release** for **$(Configuration)**. You can make a separate out-of-source build for the debug libraries.
 
 #### Linux
-Use the standard build-from-source invocation with an extra install target:
+Use the standard build-from-source invocation with an extra install target:  
+
     cd dcmtk
     ./configure
     make
