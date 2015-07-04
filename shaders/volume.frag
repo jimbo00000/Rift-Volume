@@ -147,7 +147,15 @@ vec3 getSceneColor( in vec3 ro, in vec3 rd, inout float depth )
         else if ( any( greaterThan(samplePt, vec3(1.0)) ) )
             continue;
 
+        // Short range is [-32768,32767]
+        // min value is -2000
+        float sampleScale = 9.;
+        float sampleScaleBias = 0.;//2000.;
+
         float voxelVal = texture( volume, samplePt ).r;
+        voxelVal *= sampleScale;
+        voxelVal += sampleScaleBias;
+
         vec4 txfrCol = texture2D( colormap, vec2(voxelVal, 0.5) );
         float texOpacity = texture2D( opacitymap, vec2(voxelVal, 0.5) ).r;
         accum.rgb += u_opacityScale * texOpacity * txfrCol.rgb;
