@@ -164,8 +164,9 @@ void VolumeScene::_DrawScreenQuad() const
 
     if (m_pFm != NULL)
     {
-        const float tr = m_pFm->GetTriggerValue(FlyingMouse::Left);
-        const float os = 0.05f + 0.2f * tr;
+        const float tl = m_pFm->GetTriggerValue(FlyingMouse::Left);
+        const float tr = m_pFm->GetTriggerValue(FlyingMouse::Right);
+        const float os = 0.05f + 0.2f * std::max(tl, tr);
         glUniform1f(m_raymarch.GetUniLoc("u_opacityScale"), os);
     }
 
