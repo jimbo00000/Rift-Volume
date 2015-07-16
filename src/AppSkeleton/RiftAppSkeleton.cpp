@@ -21,6 +21,11 @@
 
 #define USE_OVR_PERF_LOGGING
 
+#ifndef PROJECT_NAME
+// This macro should be defined in CMakeLists.txt
+#define PROJECT_NAME "RiftSkeleton"
+#endif
+
 RiftAppSkeleton::RiftAppSkeleton()
 : m_Hmd(NULL)
 , m_hmdCaps(0)
@@ -31,10 +36,13 @@ RiftAppSkeleton::RiftAppSkeleton()
     m_eyePoseCached = OVR::Posef();
     memset(m_logUserData, 0, 256);
 #ifdef USE_OVR_PERF_LOGGING
-    sprintf(m_logUserData, "RiftVolume");
+    sprintf(m_logUserData, PROJECT_NAME);
     // Unfortunately, the OVR perf log does not appear to re-read data
     // at the given user pointer each log entry(~1Hz). Is this a bug?
 #endif
+
+    m_dashScene.SetHmdPositionPointer(&m_hmdRoLocal);
+    m_dashScene.SetHmdDirectionPointer(&m_hmdRdLocal);
 }
 
 RiftAppSkeleton::~RiftAppSkeleton()
@@ -96,7 +104,7 @@ void RiftAppSkeleton::initHMD()
     }
 
 #ifdef USE_OVR_PERF_LOGGING
-    ovrHmd_StartPerfLog(m_Hmd, "RiftVolumexxx-PerfLog.csv", m_logUserData);
+    ovrHmd_StartPerfLog(m_Hmd, PROJECT_NAME "-PerfLog.csv", m_logUserData);
 #endif
 
     //const unsigned int caps = ovrHmd_GetEnabledCaps(m_Hmd);
@@ -389,6 +397,37 @@ void RiftAppSkeleton::timestep(double absTime, double dt)
 #endif
 }
 
+// Store HMD position and direction for gaze tracking in timestep.
+// OVR SDK requires head pose be queried between ovrHmd_BeginFrameTiming and ovrHmd_EndFrameTiming.
+// Don't worry - we're just writing to _mutable_ members, it's still const!
+void RiftAppSkeleton::_StoreHmdPose(const ovrPosef& eyePose) const
+{
+    m_hmdRo.x = eyePose.Position.x + m_chassisPos.x;
+    m_hmdRo.y = eyePose.Position.y + m_chassisPos.y;
+    m_hmdRo.z = eyePose.Position.z + m_chassisPos.z;
+
+    const glm::mat4 w2eye = makeWorldToChassisMatrix() * makeMatrixFromPose(eyePose);
+    const OVR::Matrix4f rotmtx = makeOVRMatrixFromGlmMatrix(w2eye);
+    const OVR::Vector4f lookFwd(0.f, 0.f, -1.f, 0.f);
+    const OVR::Vector4f rotvec = rotmtx.Transform(lookFwd);
+    m_hmdRd.x = rotvec.x;
+    m_hmdRd.y = rotvec.y;
+    m_hmdRd.z = rotvec.z;
+
+    // Store a separate copy of (ro,rd) in local space without chassis txfms applied.
+    m_hmdRoLocal.x = eyePose.Position.x;
+    m_hmdRoLocal.y = eyePose.Position.y;
+    m_hmdRoLocal.z = eyePose.Position.z;
+
+    const OVR::Matrix4f rotmtxLocal = OVR::Matrix4f(eyePose.Orientation);
+    const OVR::Vector4f rotvecLocal = rotmtxLocal.Transform(OVR::Vector4f(0.0f, 0.0f, -1.0f, 0.0f));
+    m_hmdRdLocal.x = rotvecLocal.x;
+    m_hmdRdLocal.y = rotvecLocal.y;
+    m_hmdRdLocal.z = rotvecLocal.z;
+
+    m_eyePoseCached = eyePose; // cache this for movement direction
+}
+
 void RiftAppSkeleton::display_stereo_undistorted() const
 {
     ovrHmd hmd = m_Hmd;
@@ -441,6 +480,7 @@ void RiftAppSkeleton::display_stereo_undistorted() const
 
         const ovrPosef eyePose = outEyePoses[e];
         m_eyePoseCached = eyePose; // cache this for movement direction
+        _StoreHmdPose(eyePose);
         const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 
@@ -517,6 +557,7 @@ void RiftAppSkeleton::display_sdk() const
         renderPose[e] = eyePose;
         eyeTexture[e] = m_EyeTexture[e].Texture;
         m_eyePoseCached = eyePose; // cache this for movement direction
+        _StoreHmdPose(eyePose);
 
         const ovrGLTexture& otex = m_EyeTexture[e];
         const ovrRecti& rvp = otex.OGL.Header.RenderViewport;
@@ -604,6 +645,7 @@ void RiftAppSkeleton::display_client() const
 
         const ovrPosef eyePose = outEyePoses[eye];
         m_eyePoseCached = eyePose; // cache this for movement direction
+        _StoreHmdPose(eyePose);
         const glm::mat4 viewLocal = makeMatrixFromPose(eyePose);
         const glm::mat4 viewWorld = makeWorldToChassisMatrix() * viewLocal;
 

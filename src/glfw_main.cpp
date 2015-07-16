@@ -48,6 +48,11 @@ RiftAppSkeleton g_app;
 AppSkeleton g_app;
 #endif
 
+#ifndef PROJECT_NAME
+// This macro should be defined in CMakeLists.txt
+#define PROJECT_NAME "RiftSkeleton"
+#endif
+
 RenderingMode g_renderMode;
 Timer g_timer;
 double g_lastFrameTime = 0.0;
@@ -389,7 +394,30 @@ void mouseDown(GLFWwindow* pWindow, int button, int action, int mods)
     {
         which_button = -1;
     }
-    g_app.OnMouseButton(button, action);
+    //g_app.OnMouseButton(button, action);
+
+    if (action == GLFW_PRESS)
+    {
+        g_app.DismissHealthAndSafetyWarning();
+    }
+
+    DashboardScene& dash = g_app.m_dashScene;
+    if ((action==GLFW_PRESS)&&(button==GLFW_MOUSE_BUTTON_MIDDLE))
+    {
+        dash.m_bDraw = !dash.m_bDraw;
+    }
+    if (dash.m_bDraw)
+    {
+        if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            const int flag = (action == GLFW_PRESS) ? 1 : 0;
+            dash.SetHoldingFlag(flag);
+            LOG_INFO("hold flag: %d", flag);
+        }
+    }
+
+    if      ((button==GLFW_MOUSE_BUTTON_LEFT)&&(action==GLFW_PRESS  )) dash.SendMouseClick(1);
+    else if ((button==GLFW_MOUSE_BUTTON_LEFT)&&(action==GLFW_RELEASE)) dash.SendMouseClick(0);
 }
 
 void mouseMove(GLFWwindow* pWindow, double xd, double yd)
@@ -408,6 +436,7 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
     g_app.m_mouseDeltaYaw = 0.0f;
     g_app.m_mouseMove = glm::vec3(0.0f);
 
+    DashboardScene& dash = g_app.m_dashScene;
     if (which_button == GLFW_MOUSE_BUTTON_1)
     {
         const float spinMagnitude = 0.05f;
@@ -415,20 +444,31 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
     }
     else if (which_button == GLFW_MOUSE_BUTTON_2) // Right click
     {
-        const float moveMagnitude = 0.5f;
-        g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
-        g_app.m_mouseMove.z += static_cast<float>(mmy) * moveMagnitude;
+        if (!dash.m_bDraw)
+        {
+            const float moveMagnitude = 0.5f;
+            g_app.m_mouseMove.x += static_cast<float>(mmx)* moveMagnitude;
+            g_app.m_mouseMove.z += static_cast<float>(mmy)* moveMagnitude;
+        }
     }
     else if (which_button == GLFW_MOUSE_BUTTON_3) // Middle click
     {
-        const float moveMagnitude = 0.5f;
-        g_app.m_mouseMove.x += static_cast<float>(mmx) * moveMagnitude;
-        g_app.m_mouseMove.y -= static_cast<float>(mmy) * moveMagnitude;
+        if (!dash.m_bDraw)
+        {
+            const float moveMagnitude = 0.5f;
+            g_app.m_mouseMove.x += static_cast<float>(mmx)* moveMagnitude;
+            g_app.m_mouseMove.y -= static_cast<float>(mmy)* moveMagnitude;
+        }
     }
     else
     {
         // Passive motion, no mouse button pressed
         g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
+    }
+
+    if (dash.m_bDraw)
+    {
+        dash.SendMouseMotion(x, y);
     }
 }
 
@@ -702,6 +742,27 @@ void destroyAuxiliaryWindow(GLFWwindow* pAuxWindow)
     g_AuxWindow = NULL;
 }
 
+// OpenGL debug callback
+void GLAPIENTRY myCallback(
+    GLenum source, GLenum type, GLuint id, GLenum severity,
+    GLsizei length, const GLchar *msg,
+#ifndef _LINUX
+    const
+#endif
+    void *data)
+{
+    switch (severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH:
+    case GL_DEBUG_SEVERITY_MEDIUM:
+    case GL_DEBUG_SEVERITY_LOW:
+        LOG_INFO("[[GL Debug]] %x %x %x %x %s", source, type, id, severity, msg);
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        break;
+    }
+}
+
 int main(int argc, char** argv)
 {
 #if defined(_WIN32)
@@ -713,17 +774,11 @@ int main(int argc, char** argv)
 #endif
 
     bool useOpenGLCoreContext = false;
-
-    g_renderMode.outputType = RenderingMode::OVR_SDK;
-
 #ifdef USE_CORE_CONTEXT
     useOpenGLCoreContext = true;
 #endif
 
-#ifdef _LINUX
-    // Linux driver seems to be lagging a bit
-    useOpenGLCoreContext = false;
-#endif
+    g_renderMode.outputType = RenderingMode::OVR_SDK;
 
     LOG_INFO("Using GLFW3 backend.");
     LOG_INFO("Compiled against GLFW %i.%i.%i",
@@ -793,6 +848,19 @@ int main(int argc, char** argv)
 
     bool swapBackBufferDims = false;
 
+    // Context setup - before window creation
+    glfwWindowHint(GLFW_DEPTH_BITS, 16);
+#if 0
+    ///@todo Fix GL errors with this on
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, useOpenGLCoreContext ? GLFW_OPENGL_CORE_PROFILE : GLFW_OPENGL_COMPAT_PROFILE);
+#endif
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#ifdef _DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
+
 #ifdef USE_OCULUSSDK
     ovrSizei sz = g_app.getHmdResolution();
     const ovrVector2i pos = g_app.getHmdWindowPos();
@@ -802,7 +870,7 @@ int main(int argc, char** argv)
     {
         // Create a normal, decorated application window
         LOG_INFO("Using Debug HMD mode.");
-        windowTitle = "RiftVolume-GLFW-DebugHMD";
+        windowTitle = PROJECT_NAME "-GLFW-DebugHMD";
         g_renderMode.outputType = RenderingMode::Mono_Buffered;
 
         l_Window = glfwCreateWindow(sz.w, sz.h, windowTitle.c_str(), NULL, NULL);
@@ -811,7 +879,7 @@ int main(int argc, char** argv)
     {
         // HMD active - position undecorated window to fill HMD viewport
         LOG_INFO("Using Direct to Rift mode.");
-        windowTitle = "RiftVolume-GLFW-Direct";
+        windowTitle = PROJECT_NAME "-GLFW-Direct";
 
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode* mode = glfwGetVideoMode(monitor);
@@ -832,7 +900,7 @@ int main(int argc, char** argv)
     else
     {
         LOG_INFO("Using Extended desktop mode.");
-        windowTitle = "RiftVolume-GLFW-Extended";
+        windowTitle = PROJECT_NAME "-GLFW-Extended";
 
         LOG_INFO("Creating GLFW_DECORATED window %dx%d@%d,%d", sz.w, sz.h, pos.x, pos.y);
         glfwWindowHint(GLFW_DECORATED, 0);
@@ -845,7 +913,7 @@ int main(int argc, char** argv)
     resize(l_Window, sz.w, sz.h); // inform AppSkeleton of window size
 #else
     l_Window = glfwCreateWindow(800, 600, "GLFW Oculus Rift Test", NULL, NULL);
-    std::string windowTitle = "RiftVolume";
+    std::string windowTitle = PROJECT_NAME;
 #endif //USE_OCULUSSDK
 
     if (!l_Window)
@@ -908,6 +976,15 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+#ifdef _DEBUG
+    // Debug callback initialization
+    // Must be done *after* glew initialization.
+    glDebugMessageCallback(myCallback, NULL);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+    glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 0,
+        GL_DEBUG_SEVERITY_NOTIFICATION, -1 , "Start debugging");
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
 
 #ifdef USE_ANTTWEAKBAR
     LOG_INFO("Using AntTweakbar.");

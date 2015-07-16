@@ -59,6 +59,11 @@ public:
     void DismissHealthAndSafetyWarning() const {}
     void CheckForTapToDismissHealthAndSafetyWarning() const {}
 
+    // For eye ray tracking - set during draw function
+    mutable glm::vec3 m_hmdRo;
+    mutable glm::vec3 m_hmdRd;
+    mutable glm::vec3 m_hmdRoLocal;
+    mutable glm::vec3 m_hmdRdLocal;
 public:
     // This public section is for exposing state variables to AntTweakBar
     Scene m_scene;

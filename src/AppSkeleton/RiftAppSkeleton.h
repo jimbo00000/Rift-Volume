@@ -68,6 +68,7 @@ protected:
     virtual glm::ivec2 getRTSize() const;
 
     virtual glm::mat4 makeWorldToEyeMatrix() const;
+    void _StoreHmdPose(const ovrPosef& eyePose) const;
 
     ovrHmd m_Hmd;
     ovrFovPort m_EyeFov[2];
