@@ -1,8 +1,11 @@
 Rift-Volume
 ============
 
-Volume Rendering for the Oculus Rift,
-plus some floating in-world UI panes.
+Volume Rendering for the Oculus Rift, plus some floating in-world UI panes.
+
+## Other Docs
+ - [BuildingDCMTK.md](BuildingDCMTK.md)  
+ - [Troubleshooting.md](Troubleshooting.md)
 
 
 ## Portability 
@@ -10,7 +13,7 @@ plus some floating in-world UI panes.
  - NVIDIA, AMD
 
 ## Dependencies 
- - [Offis DCMTK](http://git.dcmtk.org/web/) - get the latest from git and see below for instructions
+ - [Offis DCMTK](http://git.dcmtk.org/web/) - get the latest from git and see [BuildingDCMTK.md](BuildingDCMTK.md) for instructions
  - [CMake](http://www.cmake.org/) (for building)
  - [GLFW](http://www.glfw.org/download.html), [SDL2](https://www.libsdl.org/download-2.0.php) or [SFML](http://www.sfml-dev.org/download.php)
  - [GLEW](http://glew.sourceforge.net/)
@@ -21,26 +24,6 @@ plus some floating in-world UI panes.
 
 I set up my local build environment with libraries installed under a single directory(**C:/lib** on Windows, **~/lib** on Linux, **~/Development** on MacOS). This location can be changed in cmake-gui by modifying the **LIBS_HOME** variable or by editing it in CMakeLists.txt directly.
 
-### Building Offis DCMTK
-Get the latest source from the git repo:  
-
-     git clone git://git.dcmtk.org/dcmtk
-
-#### Windows
-Use CMake for an out-of-source build. Either run Visual Studio as Administrator or manually run the post-build step of the INSTALL target:  
-
-     "C:\Program Files (x86)\CMake\bin\cmake.exe" -DBUILD_TYPE=$(Configuration) -P cmake_install.cmake
-Be sure to substitute **Debug** or **Release** for **$(Configuration)**. You can make a separate out-of-source build for the debug libraries.
-
-#### Linux
-Use the standard build-from-source invocation with an extra install target:  
-
-    cd dcmtk
-    ./configure
-    make
-    make install
-    make install-libs
-Installs headers and libs to **/usr/local**.
 
 
 ## Features 
