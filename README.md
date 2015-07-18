@@ -4,8 +4,8 @@ Rift-Volume
 Volume Rendering for the Oculus Rift, plus some floating in-world UI panes.
 
 ## Other Docs
- - [BuildingDCMTK.md](BuildingDCMTK.md)  
- - [Troubleshooting.md](Troubleshooting.md)
+ - [BuildingDCMTK.md](docs/BuildingDCMTK.md)  
+ - [Troubleshooting.md](docs/Troubleshooting.md)
 
 
 ## Portability 
@@ -13,7 +13,7 @@ Volume Rendering for the Oculus Rift, plus some floating in-world UI panes.
  - NVIDIA, AMD
 
 ## Dependencies 
- - [Offis DCMTK](http://git.dcmtk.org/web/) - get the latest from git and see [BuildingDCMTK.md](BuildingDCMTK.md) for instructions
+ - [Offis DCMTK](http://git.dcmtk.org/web/) - get the latest from git and see [BuildingDCMTK.md](docs/BuildingDCMTK.md) for instructions
  - [CMake](http://www.cmake.org/) (for building)
  - [GLFW](http://www.glfw.org/download.html), [SDL2](https://www.libsdl.org/download-2.0.php) or [SFML](http://www.sfml-dev.org/download.php)
  - [GLEW](http://glew.sourceforge.net/)
