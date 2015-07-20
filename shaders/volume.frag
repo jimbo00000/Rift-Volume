@@ -11,6 +11,10 @@ uniform vec3 iChannelResolution[4]; // channel resolution (in pixels)
 uniform float u_eyeballCenterTweak;
 uniform float u_fov_y_scale;
 uniform float u_opacityScale;
+
+uniform float u_sampleScale;
+uniform float u_sampleBias;
+
 uniform mat4 mvmtx;
 uniform mat4 prmtx;
 uniform mat4 obmtx;
@@ -148,13 +152,10 @@ vec3 getSceneColor( in vec3 ro, in vec3 rd, inout float depth )
             continue;
 
         // Short range is [-32768,32767]
-        // min value is -2000
-        float sampleScale = 9.;
-        float sampleScaleBias = 0.;//2000.;
 
         float voxelVal = texture( volume, samplePt ).r;
-        voxelVal *= sampleScale;
-        voxelVal += sampleScaleBias;
+        voxelVal += u_sampleBias;
+        voxelVal *= u_sampleScale;
 
         vec4 txfrCol = texture2D( colormap, vec2(voxelVal, 0.5) );
         float texOpacity = texture2D( opacitymap, vec2(voxelVal, 0.5) ).r;

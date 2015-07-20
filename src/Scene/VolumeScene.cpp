@@ -16,6 +16,8 @@ VolumeScene::VolumeScene()
 , m_volumeTex(0)
 , m_opacityTex(NULL)
 , m_colorTex(NULL)
+, m_sampleScale(9.f)
+, m_sampleBias(0.f)
 {
     glm::mat4 ori = glm::rotate(glm::mat4(1.0f), 0.5f*static_cast<float>(M_PI), glm::vec3(1,0,0));
     ori = glm::rotate(ori, static_cast<float>(M_PI), glm::vec3(0,0,1));
@@ -169,6 +171,9 @@ void VolumeScene::_DrawScreenQuad() const
         const float os = 0.05f + 0.2f * std::max(tl, tr);
         glUniform1f(m_raymarch.GetUniLoc("u_opacityScale"), os);
     }
+
+    glUniform1f(m_raymarch.GetUniLoc("u_sampleScale"), m_sampleScale);
+    glUniform1f(m_raymarch.GetUniLoc("u_sampleBias"), m_sampleBias);
 
     RaymarchShaderScene::_DrawScreenQuad();
 }

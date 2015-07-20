@@ -75,6 +75,12 @@ void InitializeBar()
 
     TwAddVarRW(g_pTweakbar, "Draw VolumeScene", TW_TYPE_BOOLCPP, &g_app.m_volumeScene.m_bDraw,
         "  group='RaymarchScene' ");
+
+    TwAddVarRW(g_pTweakbar, "Sample scale", TW_TYPE_FLOAT, &g_app.m_volumeScene.m_sampleScale,
+        " min=-10 max=10 step=0.05 group='RaymarchScene' ");
+    TwAddVarRW(g_pTweakbar, "Sample bias", TW_TYPE_FLOAT, &g_app.m_volumeScene.m_sampleBias,
+        " min=-1 max=1 step=0.0005 group='RaymarchScene' ");
+
 }
 #endif
 

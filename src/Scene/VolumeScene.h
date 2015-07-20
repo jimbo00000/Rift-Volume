@@ -29,6 +29,9 @@ protected:
     GLuint m_volumeTex;
     GLuint* m_opacityTex;
     GLuint* m_colorTex;
+public:
+    float m_sampleScale;
+    float m_sampleBias;
 
 private: // Disallow copy ctor and assignment operator
     VolumeScene(const VolumeScene&);
