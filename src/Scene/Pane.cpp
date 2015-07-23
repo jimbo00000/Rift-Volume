@@ -107,7 +107,7 @@ void Pane::DrawCursor() const
     if (m_visible == false)
         return;
 
-    if (!m_cursorInPane)
+    if (MouseCursorActive() == false)
         return;
 
     // Restore current program when we're done; we are rendering to FBO
@@ -154,7 +154,7 @@ void Pane::DrawToFBO() const
     if (m_visible == false)
         return;
 
-    if (m_cursorInPane || !m_tx.m_lockedAtClickPos)
+    if (MouseCursorActive() || !m_tx.m_lockedAtClickPos)
         glClearColor(0.25f, 0.25f, 0.25f, 0.0f);
     else
         glClearColor(0,0,0,0);

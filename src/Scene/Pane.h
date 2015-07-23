@@ -76,6 +76,8 @@ public:
         const glm::mat4& projection,
         const glm::mat4& object) const;
 
+    bool MouseCursorActive() const { return m_cursorInPane; }
+
 protected:
     virtual void _InitPointerAttributes();
     virtual void _InitPlaneAttributes();

@@ -63,7 +63,7 @@ void AntPane::DrawToFBO() const
 
     bindFBO(m_paneRenderBuffer);
     {
-        if (m_cursorInPane || !m_tx.m_lockedAtClickPos)
+        if (MouseCursorActive() || !m_tx.m_lockedAtClickPos)
             glClearColor(0.25f, 0.25f, 0.25f, 0.0f);
         else
             glClearColor(0,0,0,0);
