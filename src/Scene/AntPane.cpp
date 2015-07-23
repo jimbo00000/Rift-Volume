@@ -92,7 +92,7 @@ void AntPane::DrawPaneWithShader(
     glBindTexture(GL_TEXTURE_2D, m_paneRenderBuffer.tex);
     glUniform1i(sh.GetUniLoc("fboTex"), 0);
 
-    glUniform1f(sh.GetUniLoc("u_brightness"), m_cursorInPane ? 1.0f : 0.5f);
+    glUniform1f(sh.GetUniLoc("u_brightness"), MouseCursorActive() ? 1.f : .5f);
 
     sh.bindVAO();
     {
