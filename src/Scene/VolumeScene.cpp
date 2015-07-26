@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 
 #include "DicomLoader.h"
+#include "StringFunctions.h"
 
 VolumeScene::VolumeScene()
 : RaymarchShaderScene()
@@ -41,7 +42,8 @@ void VolumeScene::initGL()
 #ifdef _LINUX
     LoadTextureFromDicom("/run/media/jim/300GHD/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0002");
 #else
-    LoadTextureFromDicom("I:/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0002");
+    //LoadTextureFromDicom("I:/Datasets/nemamfct.images/DISCIMG/IMAGES/CT0002");
+    LoadTextureFromMhdAndRaw("CTKnee/CTknee.mhd");
 #endif
 }
 
@@ -129,6 +131,98 @@ void VolumeScene::LoadTextureFromBrickOfShorts(const char* pFilename)
     delete [] pShortData;
 
     fclose(pFile);
+}
+
+void VolumeScene::LoadTextureFromMhdAndRaw(const char* pFilename)
+{
+    if (pFilename == NULL)
+        return;
+
+    std::ifstream file;
+    file.open(pFilename, std::ios::in);
+    if (!file.is_open())
+        return;
+
+    unsigned int dimx=0, dimy=0, dimz=0;
+    std::string dataFile = "";
+
+    std::string line;
+    while (std::getline(file, line))
+    {
+        std::vector<std::string> toks = split(line, '=');
+        if (toks.size() < 2)
+            continue;
+
+        const std::string& t = trim(toks[0]);
+        ///@todo More complete handling of the file format
+        if (!t.compare("DimSize"))
+        {
+            const std::string dstr = trim(toks[1]);
+            const std::vector<std::string> dimstrs = split(dstr, ' ');
+            if (dimstrs.size() == 3)
+            {
+                dimx = atoi(dimstrs[0].c_str());
+                dimy = atoi(dimstrs[1].c_str());
+                dimz = atoi(dimstrs[2].c_str());
+            }
+        }
+        else if (!t.compare("ElementDataFile"))
+        {
+            dataFile = trim(toks[1]);
+        }
+    }
+    file.close();
+
+    ///@todo Get the path correctly
+    dataFile = "CTKnee/" + dataFile;
+
+    std::cout << "Reading "
+        << dimx << " x "
+        << dimy << " x "
+        << dimz << " uchars from "
+        << dataFile << "..."
+        << std::endl;
+
+    FILE* pDataFile = fopen(dataFile.c_str(), "rb");
+    if (pDataFile == NULL)
+    {
+        printf("File error : %s\n", pFilename);
+        return;
+    }
+
+    const unsigned int sz = dimx * dimy * dimz;
+    unsigned char* pUCharData = new unsigned char[sz];
+    size_t result = fread(pUCharData, sizeof(unsigned char), sz, pDataFile);
+    printf("Read  %d unsigned shorts ( %d x %d x %d )\n",
+        result, dimx, dimy, dimz);
+
+    glGenTextures(1, &m_volumeTex);
+    glBindTexture(GL_TEXTURE_3D, m_volumeTex);
+    {
+        glPixelTransferf(GL_RED_SCALE, .5f);
+        //glPixelTransferf(GL_RED_BIAS, scaledOffset);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+        glTexImage3D(GL_TEXTURE_3D,
+            0,
+            GL_R8,
+            dimx, dimy, dimz,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            pUCharData);
+    }
+    glBindTexture(GL_TEXTURE_3D, 0);
+
+    glBindTexture(GL_TEXTURE_3D, 0);
+
+    delete[] pUCharData;
+
+    fclose(pDataFile);
 }
 
 void VolumeScene::LoadTextureFromDicom(const char* pFilename)
