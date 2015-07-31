@@ -11,7 +11,10 @@ static void TW_CALL DisableVSyncCB(void*) { SetVsync(0); }
 static void TW_CALL AdaptiveVSyncCB(void*) { SetVsync(-1); }
 static void TW_CALL RecenterPoseCB(void*) { g_app.RecenterPose(); }
 static void TW_CALL StandingCB(void*) { glm::vec3 p(0,1.78f,2); g_app.SetChassisPosition(p); }
-static void TW_CALL SittingCB(void*) { glm::vec3 p(0,1.27f,2); g_app.SetChassisPosition(p); }
+static void TW_CALL SittingCB(void*) { glm::vec3 p(0, 1.27f, 2); g_app.SetChassisPosition(p); }
+static void TW_CALL HalveSizeCB(void*) { g_app.m_volumeScene.HalveSize(); }
+static void TW_CALL DoubleSizeCB(void*) { g_app.m_volumeScene.DoubleSize(); }
+static void TW_CALL ResetTransformationCB(void*) { g_app.m_volumeScene.ResetTransformation(); }
 
 static void TW_CALL GetDisplayFPS(void* value, void*)
 {
@@ -81,6 +84,9 @@ void InitializeBar()
     TwAddVarRW(g_pTweakbar, "Sample bias", TW_TYPE_FLOAT, &g_app.m_volumeScene.m_sampleBias,
         " min=-1 max=1 step=0.0005 group='RaymarchScene' ");
 
+    TwAddButton(g_pTweakbar, "Halve Size", HalveSizeCB, NULL, " group='RaymarchScene' ");
+    TwAddButton(g_pTweakbar, "Double Size", DoubleSizeCB, NULL, " group='RaymarchScene' ");
+    TwAddButton(g_pTweakbar, "Reset Transformation", ResetTransformationCB, NULL, " group='RaymarchScene' ");
 }
 #endif
 

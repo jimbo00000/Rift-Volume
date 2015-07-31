@@ -36,6 +36,8 @@ public:
         m_tx.ResetPosition();
         m_tx.ResetScale();
     }
+    virtual void HalveSize() { m_tx.m_accumulatedScale /= 2.f; }
+    virtual void DoubleSize() { m_tx.m_accumulatedScale *= 2.f; }
 
 protected:
     void _InitShaderRectAttributes();
