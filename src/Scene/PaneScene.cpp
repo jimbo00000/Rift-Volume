@@ -266,6 +266,7 @@ void PaneScene::timestep(double absTime, double dt)
             continue;
 
         pP->m_cursorInPane = false;
+        pP->m_hmdInPane = false;
 
         glm::vec2 hmdPt(0.0f);
         float tHmd = 0.f;
@@ -273,7 +274,7 @@ void PaneScene::timestep(double absTime, double dt)
         if (hmdInPane)
         {
             pP->m_pointerCoords = hmdPt;
-            pP->m_cursorInPane = true;
+            pP->m_hmdInPane = true;
         }
 
 #ifdef USE_SIXENSE

@@ -76,7 +76,7 @@ public:
         const glm::mat4& projection,
         const glm::mat4& object) const;
 
-    bool MouseCursorActive() const { return m_cursorInPane; }
+    bool MouseCursorActive() const { return m_cursorInPane || m_hmdInPane; }
 
 protected:
     virtual void _InitPointerAttributes();
@@ -88,6 +88,7 @@ protected:
 public:
     FBO m_paneRenderBuffer;
     bool m_cursorInPane;
+    bool m_hmdInPane;
     glm::vec2 m_pointerCoords;
     holdingState m_holdState;
 
