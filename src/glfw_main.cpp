@@ -423,6 +423,11 @@ void mouseDown(GLFWwindow* pWindow, int button, int action, int mods)
 void mouseMove(GLFWwindow* pWindow, double xd, double yd)
 {
     glfwGetCursorPos(pWindow, &xd, &yd);
+    // With GLFW_CURSOR_DISABLED, coordinates are unbounded. Prevent the cursor getting lost.
+    glfwSetCursorPos(pWindow,
+        std::max(std::min(1000., xd), 0.),
+        std::max(std::min(1000., yd), 0.));
+
     const int x = static_cast<int>(xd);
     const int y = static_cast<int>(yd);
 

@@ -353,21 +353,30 @@ bool PaneScene::SendMouseMotion(int x, int y)
         return false;
 
     // Pass mouse events only to the first pane in the set(AntPane for DashboardScene)
-    std::vector<Pane*>::iterator it = m_panes.begin();
-    Pane* pP = *it;
-    if (pP == NULL)
-        return false;
+    bool ret = false;
+    for (std::vector<Pane*>::iterator it = m_panes.begin();
+        it != m_panes.end();
+        ++it)
+    {
+        Pane* pP = *it;
+        if (pP == NULL)
+            continue;
+        if (pP->m_hmdInPane == false)
+            continue;
 
-    const glm::ivec2 fbsz = pP->GetFBOSize();
-    const glm::vec2 normPt(
-        static_cast<float>(x) / static_cast<float>(fbsz.x),
-        static_cast<float>(y) / static_cast<float>(fbsz.y));
-    pP->m_pointerCoords = normPt;
-    pP->m_cursorInPane = true;
+        const glm::ivec2 fbsz = pP->GetFBOSize();
+        const glm::vec2 normPt(
+            static_cast<float>(x) / static_cast<float>(fbsz.x),
+            static_cast<float>(y) / static_cast<float>(fbsz.y));
+        pP->m_pointerCoords = normPt;
+        pP->m_cursorInPane = true;
+        ret = true;
 
-    pP->OnMouseMove(x, y);
+        pP->OnMouseMove(x, y);
+        LOG_INFO("Mousemove: %d %d\n", x, y);
+    }
     m_mouseMotionCooldown.reset();
-    return true;
+    return ret;
 }
 
 void PaneScene::SendMouseClick(int state)
@@ -381,6 +390,8 @@ void PaneScene::SendMouseClick(int state)
     {
         Pane* pP = *it;
         if (pP == NULL)
+            continue;
+        if (pP->m_hmdInPane == false)
             continue;
         pP->OnMouseClick(state, 0, 0);
     }
