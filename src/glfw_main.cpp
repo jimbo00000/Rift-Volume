@@ -437,6 +437,14 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
     g_app.m_mouseMove = glm::vec3(0.0f);
 
     DashboardScene& dash = g_app.m_dashScene;
+    if (dash.m_bDraw)
+    {
+        const bool ret = dash.SendMouseMotion(x, y);
+        // Consume event if the pane handled it.
+        if (ret == true)
+            return;
+    }
+
     if (which_button == GLFW_MOUSE_BUTTON_1)
     {
         const float spinMagnitude = 0.05f;
@@ -464,11 +472,6 @@ void mouseMove(GLFWwindow* pWindow, double xd, double yd)
     {
         // Passive motion, no mouse button pressed
         g_app.OnMouseMove(static_cast<int>(x), static_cast<int>(y));
-    }
-
-    if (dash.m_bDraw)
-    {
-        dash.SendMouseMotion(x, y);
     }
 }
 

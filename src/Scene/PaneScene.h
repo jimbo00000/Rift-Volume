@@ -36,7 +36,7 @@ public:
     virtual std::vector<Transformation*> GetTransformationPointers();
     virtual void ResetTransformation();
 
-    virtual void SendMouseMotion(int x, int y);
+    virtual bool SendMouseMotion(int x, int y);
     virtual void SendMouseClick(int state);
     virtual void SendHmdTap();
     virtual void SetHoldingFlag(int state);

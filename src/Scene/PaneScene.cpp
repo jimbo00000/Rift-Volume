@@ -344,18 +344,19 @@ void PaneScene::ResetTransformation()
 
 ///@brief Override HMD gaze direction and Hydra mouse motion action for a limited
 /// time after each mouse motion input event.
-void PaneScene::SendMouseMotion(int x, int y)
+///@return true if mouse motion event was handled with an action, false otherwise.
+bool PaneScene::SendMouseMotion(int x, int y)
 {
     if (m_bDraw == false)
-        return;
+        return false;
     if (m_panes.empty())
-        return;
+        return false;
 
     // Pass mouse events only to the first pane in the set(AntPane for DashboardScene)
     std::vector<Pane*>::iterator it = m_panes.begin();
     Pane* pP = *it;
     if (pP == NULL)
-        return;
+        return false;
 
     const glm::ivec2 fbsz = pP->GetFBOSize();
     const glm::vec2 normPt(
@@ -366,6 +367,7 @@ void PaneScene::SendMouseMotion(int x, int y)
 
     pP->OnMouseMove(x, y);
     m_mouseMotionCooldown.reset();
+    return true;
 }
 
 void PaneScene::SendMouseClick(int state)
