@@ -14,7 +14,6 @@ Pane::Pane()
 , m_hmdInPane(false)
 , m_pointerCoords(0.0f)
 , m_holdState()
-, m_acceptMouseMotion(false)
 , m_visible(true)
 {
     m_panePts.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));

@@ -94,7 +94,6 @@ public:
 
     std::vector<glm::vec3> m_panePts;
     Transformation m_tx;
-    bool m_acceptMouseMotion;
     bool m_visible;
 
 private: // Disallow copy ctor and assignment operator
