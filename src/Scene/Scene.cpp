@@ -29,10 +29,7 @@
 #include "Logger.h"
 
 Scene::Scene()
-: m_basic()
-, m_plane()
-, m_phaseVal(0.0f)
-, m_amplitude(0.01f)
+: m_plane()
 {
 }
 
@@ -42,63 +39,10 @@ Scene::~Scene()
 
 void Scene::initGL()
 {
-    m_basic.initProgram("basic");
-    m_basic.bindVAO();
-    _InitCubeAttributes();
-    glBindVertexArray(0);
-
     m_plane.initProgram("basicplane");
     m_plane.bindVAO();
     _InitPlaneAttributes();
     glBindVertexArray(0);
-}
-
-///@brief While the basic VAO is bound, gen and bind all buffers and attribs.
-void Scene::_InitCubeAttributes()
-{
-    const glm::vec3 minPt(0,0,0);
-    const glm::vec3 maxPt(1,1,1);
-    const glm::vec3 verts[] = {
-        minPt,
-        glm::vec3(maxPt.x, minPt.y, minPt.z),
-        glm::vec3(maxPt.x, maxPt.y, minPt.z),
-        glm::vec3(minPt.x, maxPt.y, minPt.z),
-        glm::vec3(minPt.x, minPt.y, maxPt.z),
-        glm::vec3(maxPt.x, minPt.y, maxPt.z),
-        maxPt,
-        glm::vec3(minPt.x, maxPt.y, maxPt.z)
-    };
-
-    GLuint vertVbo = 0;
-    glGenBuffers(1, &vertVbo);
-    m_basic.AddVbo("vPosition", vertVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vertVbo);
-    glBufferData(GL_ARRAY_BUFFER, 8*3*sizeof(GLfloat), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(m_basic.GetAttrLoc("vPosition"), 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    GLuint colVbo = 0;
-    glGenBuffers(1, &colVbo);
-    m_basic.AddVbo("vColor", colVbo);
-    glBindBuffer(GL_ARRAY_BUFFER, colVbo);
-    glBufferData(GL_ARRAY_BUFFER, 8*3*sizeof(GLfloat), verts, GL_STATIC_DRAW);
-    glVertexAttribPointer(m_basic.GetAttrLoc("vColor"), 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-    glEnableVertexAttribArray(m_basic.GetAttrLoc("vPosition"));
-    glEnableVertexAttribArray(m_basic.GetAttrLoc("vColor"));
-
-    const unsigned int quads[] = {
-        0,3,2, 1,0,2, // ccw
-        4,5,6, 7,4,6,
-        1,2,6, 5,1,6,
-        2,3,7, 6,2,7,
-        3,0,4, 7,3,4,
-        0,1,5, 4,0,5,
-    };
-    GLuint quadVbo = 0;
-    glGenBuffers(1, &quadVbo);
-    m_basic.AddVbo("elements", quadVbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadVbo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12*3*sizeof(GLuint), quads, GL_STATIC_DRAW);
 }
 
 ///@brief While the basic VAO is bound, gen and bind all buffers and attribs.
@@ -145,63 +89,11 @@ void Scene::_InitPlaneAttributes()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 2*3*sizeof(GLuint), tris, GL_STATIC_DRAW);
 }
 
-// Draw an RGB color cube
-void Scene::DrawColorCube() const
-{
-    m_basic.bindVAO();
-    glDrawElements(GL_TRIANGLES,
-                   6*3*2, // 6 triangle pairs
-                   GL_UNSIGNED_INT,
-                   0);
-    glBindVertexArray(0);
-}
-
-/// Draw a circle of color cubes(why not)
-void Scene::_DrawBouncingCubes(
-    const glm::mat4& modelview,
-    glm::vec3 center,
-    float radius,
-    float scale) const
-{
-    const glm::mat4 ringCenter = glm::translate(modelview, center);
-
-    const int numCubes = 12;
-    for (int i=0; i<numCubes; ++i)
-    {
-        const float frequency = 3.0f;
-        const float posPhase = 2.0f * (float)M_PI * (float)i / (float)numCubes;
-        const float oscVal = m_amplitude * sin(frequency * (m_phaseVal + posPhase));
-
-        glm::mat4 sinmtx = glm::rotate(ringCenter, posPhase, glm::vec3(0.0f, 1.0f, 0.0f));
-        sinmtx = glm::translate(
-            sinmtx,
-            glm::vec3(0.0f, oscVal, radius));
-        sinmtx = glm::scale(sinmtx, glm::vec3(scale));
-
-        glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(sinmtx));
-        DrawColorCube();
-    }
-}
-
-
 void Scene::_DrawScenePlanes(const glm::mat4& modelview) const
 {
     m_plane.bindVAO();
     {
         // floor
-        glDrawElements(GL_TRIANGLES,
-                       3*2, // 2 triangle pairs
-                       GL_UNSIGNED_INT,
-                       0);
-
-        const float ceilHeight = 3.0f;
-        glm::mat4 ceilmtx = glm::translate(
-            modelview,
-            glm::vec3(0.0f, ceilHeight, 0.0f));
-
-        glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(ceilmtx));
-
-        // ceiling
         glDrawElements(GL_TRIANGLES,
                        3*2, // 2 triangle pairs
                        GL_UNSIGNED_INT,
@@ -225,28 +117,6 @@ void Scene::DrawScene(
         _DrawScenePlanes(modelview);
     }
     glUseProgram(0);
-
-    glUseProgram(m_basic.prog());
-    {
-        glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(modelview));
-        glUniformMatrix4fv(m_basic.GetUniLoc("prmtx"), 1, false, glm::value_ptr(projection));
-
-        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 1.0f, 0.5f), 0.25f, 0.064f);
-        _DrawBouncingCubes(modelview, glm::vec3(0.0f, 0.0f, 0.5f), 1.5f, 0.5f);
-
-        (void)object;
-#if 0
-        glm::mat4 objectMatrix = modelview;
-        objectMatrix = glm::translate(objectMatrix, glm::vec3(0.0f, 1.0f, 0.0f)); // Raise rotation center above floor
-        // Rotate about cube center
-        objectMatrix = glm::translate(objectMatrix, glm::vec3(0.5f));
-        objectMatrix *= object;
-        objectMatrix = glm::translate(objectMatrix, glm::vec3(-0.5f));
-        glUniformMatrix4fv(m_basic.GetUniLoc("mvmtx"), 1, false, glm::value_ptr(objectMatrix));
-        DrawColorCube();
-#endif
-    }
-    glUseProgram(0);
 }
 
 
@@ -264,7 +134,6 @@ void Scene::RenderForOneEye(const float* pMview, const float* pPersp) const
 
 void Scene::timestep(double /*absTime*/, double dt)
 {
-    m_phaseVal += static_cast<float>(dt);
 }
 
 // Check for hits against floor plane

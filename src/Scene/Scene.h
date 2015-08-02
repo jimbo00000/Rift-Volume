@@ -36,7 +36,6 @@ public:
         ) const;
 
 protected:
-    void DrawColorCube() const;
     void DrawGrid() const;
     void DrawOrigin() const;
     void DrawScene(
@@ -45,23 +44,10 @@ protected:
         const glm::mat4& object) const;
 
 protected:
-    void _InitCubeAttributes();
     void _InitPlaneAttributes();
-
-    void _DrawBouncingCubes(
-        const glm::mat4& modelview,
-        glm::vec3 center,
-        float radius,
-        float scale) const;
     void _DrawScenePlanes(const glm::mat4& modelview) const;
 
-    ShaderWithVariables m_basic;
     ShaderWithVariables m_plane;
-
-    float m_phaseVal;
-
-public:
-    float m_amplitude;
 
 private: // Disallow copy ctor and assignment operator
     Scene(const Scene&);
